@@ -45,21 +45,15 @@ fn expand_basin(grid: Vec<Vec<u32>>, new_element: Vec<usize>, current_basin: Vec
 	let mut expanded = current_basin.clone();
 	expanded.push(new_element);
 	let mut new_basin = expanded.clone();
-	if i > 0 && grid[i-1][j] >= grid[i][j] && grid[i-1][j] < 9 {
-		new_basin = expand_basin(grid.clone(), vec!(i-1,j), expanded, depth+1);
-		expanded = new_basin.clone();
-	}
-	if i < grid.len()-1 && grid[i+1][j] >= grid[i][j] && grid[i+1][j] < 9 {
-		new_basin = expand_basin(grid.clone(), vec!(i+1,j), expanded, depth+1);
-		expanded = new_basin.clone();
-	}
-
-	if j > 0 && grid[i][j-1] >= grid[i][j] && grid[i][j-1] < 9 {
-		new_basin = expand_basin(grid.clone(), vec!(i,j-1), expanded, depth+1);
-		expanded = new_basin.clone();
-	} 
-	if j < grid[0].len()-1 && grid[i][j+1] >= grid[i][j] && grid[i][j+1] < 9 {
-		new_basin = expand_basin(grid.clone(), vec!(i,j+1), expanded, depth+1);
+	for point in vec!(vec!(i.saturating_sub(1), j), vec!(i+1, j), vec!(i, j.saturating_sub(1)), vec!(i, j+1)) {
+		if point[0] <= 0 || point[0] >= grid.len()-1 ||
+			point[1] <= 0 || point[1] >= grid[0].len()-1 {
+			continue;
+		}
+		if grid[point[0]][point[1]] < 9 {
+			new_basin = expand_basin(grid.clone(), vec!(point[0],point[1]), expanded, depth+1);
+			expanded = new_basin.clone();
+		}
 	}
 	new_basin.sort();
 	new_basin.dedup();
